@@ -377,9 +377,8 @@ function ttsSpeakSystem(text, btnEl) {
 }
 
 function ttsSpeakYoudao(text, btnEl) {
-  // Always fresh Audio element. Browser HTTP cache handles repeated URLs.
-  // Use canplaythrough (not canplay) so playback only starts when enough buffer is available
-  // to play the whole clip without interruption — guarantees we hear from position 0.
+  // Ironclad start: wait for FULL download (not just "can play through" estimate),
+  // then force seek to 0, then delay 60ms before play() to let the audio output device warm up.
   const audio = new Audio();
   audio.preload = 'auto';
   TTS_CURRENT_AUDIO = audio;
@@ -396,22 +395,40 @@ function ttsSpeakYoudao(text, btnEl) {
     cleanup();
     if ('speechSynthesis' in window) ttsSpeakSystem(text, btnEl);
   };
+
   const startPlay = () => {
     if (resolved) return;
     if (audio !== TTS_CURRENT_AUDIO) return;
     resolved = true;
     if (btnEl) btnEl.classList.remove('loading');
-    // Hard-set position to 0 before play (defensive)
-    try { if (audio.currentTime > 0) audio.currentTime = 0; } catch(e){}
-    const p = audio.play();
-    if (p && p.catch) p.catch(doFallback);
+    // Belt and suspenders to guarantee playback from absolute position 0:
+    audio.pause();
+    try { audio.currentTime = 0; } catch(e){}
+    // 60ms delay lets the audio output device fully initialize before the first sample plays.
+    // Without this, the first ~100ms gets swallowed by decoder/output warmup.
+    setTimeout(() => {
+      if (audio !== TTS_CURRENT_AUDIO) return;
+      try { audio.currentTime = 0; } catch(e){}
+      const p = audio.play();
+      if (p && p.catch) p.catch(doFallback);
+    }, 60);
   };
 
-  // Register listeners BEFORE setting src so we never miss a synchronously-fired event
-  audio.addEventListener('canplaythrough', startPlay, { once: true });
-  // Backup: if canplaythrough is slow, fire on loadeddata after 1.5s safety
-  audio.addEventListener('loadeddata', () => {
-    setTimeout(() => { if (!resolved && audio.readyState >= 2) startPlay(); }, 1500);
+  // Trigger play only when audio is ACTUALLY fully downloaded (≥98% buffered),
+  // not when the browser merely estimates it can play through.
+  const checkFullyBuffered = () => {
+    if (resolved) return;
+    if (!audio.duration || !audio.buffered.length) return;
+    const end = audio.buffered.end(audio.buffered.length - 1);
+    const start = audio.buffered.start(0);
+    if (start <= 0.05 && end >= audio.duration * 0.98) startPlay();
+  };
+
+  // Register listeners BEFORE setting src so synchronous events aren't missed
+  audio.addEventListener('progress', checkFullyBuffered);
+  audio.addEventListener('canplaythrough', () => {
+    // Grace period after canplaythrough — if still not fully buffered, force play anyway
+    setTimeout(() => { if (!resolved) startPlay(); }, 250);
   }, { once: true });
   audio.addEventListener('ended', cleanup, { once: true });
   audio.addEventListener('error', doFallback, { once: true });
@@ -419,7 +436,7 @@ function ttsSpeakYoudao(text, btnEl) {
   audio.src = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`;
   try { audio.load(); } catch(e){}
 
-  // Safety: if nothing happens in 8s, fall back to system voice
+  // Safety: if no audio in 8s, fallback to system voice
   setTimeout(() => { if (!resolved) doFallback(); }, 8000);
 }
 
