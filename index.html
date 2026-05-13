@@ -136,6 +136,9 @@ body{padding-bottom:60px}
 .zh-clickable{cursor:pointer;padding:1px 2px;border-radius:3px;transition:all 0.15s;display:inline-block}
 .zh-clickable:hover{background:rgba(200,164,90,0.2);color:var(--gold2)}
 .zh-clickable.playing{background:var(--gold);color:#fff;animation:pulse 0.6s ease}
+.zh-clickable.loading{background:rgba(200,164,90,0.15);color:var(--gold2);animation:loading-dots 1s ease infinite}
+.btn-tts.loading{background:rgba(200,164,90,0.2);animation:loading-dots 1s ease infinite}
+@keyframes loading-dots{0%,100%{opacity:0.4}50%{opacity:1}}
 .zh-frag{padding:2px 8px;margin:0 2px;background:rgba(200,164,90,0.1);border:1px solid rgba(200,164,90,0.3)}
 .zh-frag:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
 .zh-token{display:inline-block;margin:0 1px}
@@ -374,32 +377,50 @@ function ttsSpeakSystem(text, btnEl) {
 }
 
 function ttsSpeakYoudao(text, btnEl) {
-  // Always create a fresh Audio element. Browser HTTP cache handles repeated URLs.
-  // This avoids the "starts from middle" bug caused by reusing a paused audio object.
+  // Always fresh Audio element. Browser HTTP cache handles repeated URLs.
+  // Use canplaythrough (not canplay) so playback only starts when enough buffer is available
+  // to play the whole clip without interruption — guarantees we hear from position 0.
   const audio = new Audio();
   audio.preload = 'auto';
-  audio.src = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`;
   TTS_CURRENT_AUDIO = audio;
-  const cleanup = () => { if (btnEl) btnEl.classList.remove('playing'); };
+  if (btnEl) btnEl.classList.add('loading');
+
+  const cleanup = () => {
+    if (btnEl) { btnEl.classList.remove('playing'); btnEl.classList.remove('loading'); }
+  };
+  let resolved = false;
   let fellBack = false;
   const doFallback = () => {
-    if (fellBack) return; fellBack = true;
+    if (fellBack || resolved) return;
+    fellBack = true; resolved = true;
     cleanup();
-    // Try Web Speech as final fallback
     if ('speechSynthesis' in window) ttsSpeakSystem(text, btnEl);
   };
-  audio.onended = cleanup;
-  audio.onerror = doFallback;
-  // Wait for canplay before play() — ensures we start at position 0, not buffer-tail
-  audio.addEventListener('canplay', () => {
-    if (audio !== TTS_CURRENT_AUDIO) return;  // newer play replaced us
+  const startPlay = () => {
+    if (resolved) return;
+    if (audio !== TTS_CURRENT_AUDIO) return;
+    resolved = true;
+    if (btnEl) btnEl.classList.remove('loading');
+    // Hard-set position to 0 before play (defensive)
+    try { if (audio.currentTime > 0) audio.currentTime = 0; } catch(e){}
     const p = audio.play();
     if (p && p.catch) p.catch(doFallback);
+  };
+
+  // Register listeners BEFORE setting src so we never miss a synchronously-fired event
+  audio.addEventListener('canplaythrough', startPlay, { once: true });
+  // Backup: if canplaythrough is slow, fire on loadeddata after 1.5s safety
+  audio.addEventListener('loadeddata', () => {
+    setTimeout(() => { if (!resolved && audio.readyState >= 2) startPlay(); }, 1500);
   }, { once: true });
-  // Timeout safety: if no canplay in 4s, fallback
-  setTimeout(() => {
-    if (audio === TTS_CURRENT_AUDIO && audio.readyState < 2) doFallback();
-  }, 4000);
+  audio.addEventListener('ended', cleanup, { once: true });
+  audio.addEventListener('error', doFallback, { once: true });
+
+  audio.src = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`;
+  try { audio.load(); } catch(e){}
+
+  // Safety: if nothing happens in 8s, fall back to system voice
+  setTimeout(() => { if (!resolved) doFallback(); }, 8000);
 }
 
 function ttsPlay(text, btnEl) {
@@ -408,13 +429,11 @@ function ttsPlay(text, btnEl) {
   if (btnEl) btnEl.classList.add('playing');
 
   const src = ttsGetSource();
-  // 'auto' decides: prefer system if good voice available, else YouDao
   let useSystem;
   if (src === 'system') useSystem = true;
   else if (src === 'youdao') useSystem = false;
   else {
     if (!TTS_BEST_VOICE) TTS_BEST_VOICE = ttsPickBestVoice();
-    // Auto-prefer system only if we found a HIGH-quality voice (score > 50)
     useSystem = !!(TTS_BEST_VOICE && /neural|natural|premium|enhanced|wavenet|hd|yunyang|xiaoxiao|tingting/i.test(TTS_BEST_VOICE.name || ''));
   }
 
@@ -424,6 +443,24 @@ function ttsPlay(text, btnEl) {
     ttsSpeakYoudao(text, btnEl);
   }
 }
+
+// Warm browser HTTP cache: kick off a no-op fetch via dummy Audio for each text.
+// Called when an answer is revealed so by the time user clicks, bytes are already cached.
+function ttsPreWarm(texts) {
+  if (ttsGetSource() === 'system') return;  // No network needed
+  if (!TTS_BEST_VOICE) TTS_BEST_VOICE = ttsPickBestVoice();
+  // Skip pre-warm if auto-mode and we'd use system anyway
+  if (ttsGetSource() === 'auto' && TTS_BEST_VOICE && /neural|natural|premium|enhanced|wavenet|hd|yunyang|xiaoxiao|tingting/i.test(TTS_BEST_VOICE.name || '')) return;
+  for (const text of texts) {
+    if (!text || ttsPreWarmed.has(text)) continue;
+    ttsPreWarmed.add(text);
+    const a = new Audio();
+    a.preload = 'auto';
+    a.src = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`;
+    try { a.load(); } catch(e){}
+  }
+}
+const ttsPreWarmed = new Set();
 
 function showSection(name) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -547,6 +584,8 @@ function checkOrder(key, correct, pinyin, fragsJson) {
   const fb = document.getElementById(`fb-${key}`);
   let frags = [];
   try { frags = JSON.parse(fragsJson); } catch(e) {}
+  // Pre-warm browser cache for all fragments + full sentence so clicks play instantly
+  ttsPreWarm([correct, ...frags]);
   const clickable = ttsRenderByFragments(correct, frags);
   const speakerBtn = `<button class="btn-tts" onclick="ttsPlay('${correct.replace(/'/g,'').replace(/"/g,'&quot;')}', this)" title="استمع للجملة كاملة">🔊</button>`;
   if (ok) {
@@ -563,6 +602,8 @@ function revealOrder(key, correct, pinyin, explain, fragsJson) {
   fb.className = 'feedback info show';
   let frags = [];
   try { frags = JSON.parse(fragsJson); } catch(e) {}
+  // Pre-warm browser cache: by the time user reads the answer and clicks, bytes are buffered
+  ttsPreWarm([correct, ...frags]);
   const clickable = ttsRenderByFragments(correct, frags);
   const speakerBtn = `<button class="btn-tts" onclick="ttsPlay('${correct.replace(/'/g,'').replace(/"/g,'&quot;')}', this)" title="استمع للجملة كاملة">🔊</button>`;
   fb.innerHTML = `<b>الجواب الكامل:</b>
