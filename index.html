@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="author" content="Mansour Alghamdi">
 <meta name="copyright" content="© 2026 Mansour Alghamdi — man07.2012@gmail.com">
+<meta name="description" content="مرجع تفاعلي لقسم الكتابة في امتحان HSK4 — 21 قاعدة نحوية لترتيب الكلمات و11 قالب تعبير للصور، مع نطق صوتي وتقييم بالذكاء الاصطناعي.">
+<meta name="theme-color" content="#2c1810">
+<meta property="og:title" content="HSK4 — قوالب الكتابة">
+<meta property="og:description" content="مرجع تفاعلي لقسم الكتابة في امتحان HSK4 منظَّم بحسب القواعد وقوالب التعبير.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://man072012.github.io/hsk4-templates/">
+<link rel="canonical" href="https://man072012.github.io/hsk4-templates/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23c8a45a'/%3E%3Ctext x='50' y='72' font-size='62' text-anchor='middle' fill='%23fff' font-family='serif' font-weight='700'%3E書%3C/text%3E%3C/svg%3E">
 <title>HSK4 — قوالب الكتابة</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -32,7 +40,9 @@ body{padding-bottom:60px}
 .intro h2{color:var(--ink);font-size:1.05rem;margin-bottom:6px}
 .card{background:var(--paper);border:1px solid #e8e0d5;border-radius:14px;margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden;transition:all 0.25s}
 .card.open{border-color:var(--gold)}
-.card-head{padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;background:transparent;transition:background 0.2s}
+.card-head{padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;background:transparent;transition:background 0.2s;width:100%;border:none;text-align:right;font-family:inherit;color:inherit}
+.card-head:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.frag:focus-visible,.btn:focus-visible,.btn-tts:focus-visible,.zh-clickable:focus-visible,.settings-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .card-head:hover{background:#fdfaf3}
 .card.open .card-head{background:linear-gradient(135deg,#fdf8ef,#f8f0e0);border-bottom:1px solid #e8d8b8}
 .card-num{flex-shrink:0;width:36px;height:36px;border-radius:10px;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.95rem}
@@ -53,7 +63,10 @@ body{padding-bottom:60px}
 .explain{font-size:0.82rem;color:var(--ink2);line-height:1.7;margin-bottom:14px}
 .section-divider{display:flex;align-items:center;gap:10px;margin:14px 0 10px 0;color:var(--gold2);font-size:0.8rem;font-weight:700}
 .section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:#e0d5c5}
-.q-item{background:#fdfaf3;border:1px solid #e8e0d5;border-radius:10px;padding:12px;margin-bottom:10px}
+.q-item{background:#fdfaf3;border:1px solid #e8e0d5;border-radius:10px;padding:12px;margin-bottom:10px;position:relative}
+.q-item.done{border-color:rgba(44,138,79,0.4);background:#f5fdf7}
+.q-item.done::after{content:'✓';position:absolute;top:8px;left:8px;width:22px;height:22px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700}
+.progress-badge{background:rgba(200,164,90,0.18);color:var(--gold2);padding:3px 10px;border-radius:14px;font-size:0.72rem;font-weight:700;margin-right:6px}
 .q-num{display:inline-block;background:var(--gold);color:#fff;width:24px;height:24px;border-radius:50%;text-align:center;line-height:24px;font-size:0.7rem;font-weight:700;margin-left:8px}
 .frags-wrap{margin-top:8px}
 .frags-box{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;padding:10px;background:var(--paper);border-radius:8px;direction:ltr;min-height:42px;align-items:center}
@@ -159,11 +172,11 @@ body{padding-bottom:60px}
 <div class="topbar">
   <div class="topbar-row">
     <div class="logo">
-      <span class="seal">書</span>
-      <div class="logo-text">HSK4 — قوالب الكتابة<span class="sub">منظَّم حسب القواعد وقوالب التعبير</span></div>
+      <span class="seal" aria-hidden="true">書</span>
+      <h1 class="logo-text" style="margin:0">HSK4 — قوالب الكتابة<span class="sub">منظَّم حسب القواعد وقوالب التعبير</span></h1>
     </div>
-    <div class="stats"><span><b>21</b> قاعدة</span><span><b>11</b> قالب</span></div>
-    <button class="settings-btn" onclick="openSettings()">⚙️ API</button>
+    <div class="stats"><span class="progress-badge" id="progressBadge" title="عدد الجمل التي أجبتها صحيحاً">0/120 ✓</span><span><b>21</b> قاعدة</span><span><b>11</b> قالب</span></div>
+    <button class="settings-btn" onclick="openSettings()" aria-label="الإعدادات والمفتاح">⚙️ API</button>
   </div>
 </div>
 
@@ -479,6 +492,43 @@ function ttsPreWarm(texts) {
 }
 const ttsPreWarmed = new Set();
 
+function _qCtx(el) {
+  const card = el.closest('[data-q]');
+  if (!card) return null;
+  let frags = [];
+  try { frags = JSON.parse(card.dataset.frags); } catch(e){}
+  return {
+    key: card.dataset.q,
+    frags,
+    answer: card.dataset.ans,
+    pinyin: card.dataset.pin,
+    explain: card.dataset.exp,
+    card
+  };
+}
+function checkOrderEl(btn) {
+  const c = _qCtx(btn); if (!c) return;
+  checkOrder(c.key, c.answer, c.pinyin, JSON.stringify(c.frags));
+}
+function revealOrderEl(btn) {
+  const c = _qCtx(btn); if (!c) return;
+  revealOrder(c.key, c.answer, c.pinyin, c.explain, JSON.stringify(c.frags));
+}
+function clearOrderEl(btn) {
+  const c = _qCtx(btn); if (!c) return;
+  clearOrder(c.key);
+}
+
+function pickFrag(btn, fi) {
+  const c = _qCtx(btn); if (!c) return;
+  const key = c.key, frags = c.frags;
+  if (!orderState[key]) orderState[key] = {answer:[], frags:frags};
+  const st = orderState[key];
+  if (st.answer.includes(fi)) return;
+  st.answer.push(fi);
+  refreshOrder(key);
+}
+
 function showSection(name) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('section-'+name).classList.add('active');
@@ -491,12 +541,11 @@ function toggleCard(el) {
   const isOpen = card.classList.contains('open');
   if (isOpen) {
     card.classList.remove('open');
+    el.setAttribute('aria-expanded', 'false');
   } else {
     card.classList.add('open');
-    // Initialize practice items if not done
-    if (!card.dataset.init) {
-      card.dataset.init = '1';
-    }
+    el.setAttribute('aria-expanded', 'true');
+    if (!card.dataset.init) card.dataset.init = '1';
   }
 }
 
@@ -512,15 +561,15 @@ function renderGrammar() {
   list.innerHTML = GRAMMAR.map((g, gi) => {
     if (!g.questions.length) return '';
     return `<div class="card" id="g-card-${gi}">
-      <div class="card-head" onclick="toggleCard(this)">
+      <button class="card-head" type="button" onclick="toggleCard(this)" aria-expanded="false">
         <div class="card-num">${gi+1}</div>
         <div class="card-titles">
           <div class="card-title-ar">${g.title_ar}</div>
           <div class="card-title-zh">${g.title_zh}</div>
         </div>
         <div class="card-badge">${g.count} جملة</div>
-        <div class="chev">▼</div>
-      </div>
+        <div class="chev" aria-hidden="true">▼</div>
+      </button>
       <div class="card-body">
         <div class="pattern-box">
           <div class="pattern-label">القالب · 公式</div>
@@ -541,30 +590,22 @@ function renderOrderQ(gi, qi, q) {
   const ansEsc = q.answer.replace(/'/g,'');
   const pinEsc = (q.pinyin||'').replace(/'/g,'');
   const expEsc = (q.explain||'').replace(/'/g,'');
-  const fragsJsonAttr = JSON.stringify(frags).replace(/"/g,'&quot;');
-  return `<div class="q-item" id="q-${key}">
+  const fragsAttr = JSON.stringify(frags).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return `<div class="q-item" id="q-${key}" data-q="${key}" data-frags="${fragsAttr}" data-ans="${ansEsc.replace(/"/g,'&quot;')}" data-pin="${pinEsc.replace(/"/g,'&quot;')}" data-exp="${expEsc.replace(/"/g,'&quot;')}">
     <div><span class="q-num">${q.qNum}</span><span style="font-size:0.78rem;color:var(--ink3)">من الاختبار ${q.examId}</span></div>
     <div class="frags-wrap">
-      <div class="frags-box" id="frags-${key}">
-        ${frags.map((f, fi) => `<span class="frag" data-i="${fi}" onclick="pickFrag('${key}',${fi},${fragsJsonAttr})">${f}</span>`).join('')}
+      <div class="frags-box" id="frags-${key}" role="group" aria-label="قطع الجملة المعروضة عشوائياً">
+        ${frags.map((f, fi) => `<button class="frag" type="button" data-i="${fi}" onclick="pickFrag(this,${fi})">${f}</button>`).join('')}
       </div>
-      <div class="answer-area" id="ans-${key}" onclick="emptyAns('${key}')"></div>
+      <div class="answer-area" id="ans-${key}" role="region" aria-live="polite" aria-label="منطقة الإجابة"></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-check" data-frags="${fragsJsonAttr}" onclick="checkOrder('${key}','${ansEsc}','${pinEsc}',this.dataset.frags)">تحقّق</button>
-      <button class="btn btn-clear" onclick="clearOrder('${key}')">امسح</button>
-      <button class="btn btn-reveal" data-frags="${fragsJsonAttr}" onclick="revealOrder('${key}','${ansEsc}','${pinEsc}','${expEsc}',this.dataset.frags)">أظهر الجواب</button>
+      <button class="btn btn-check" type="button" onclick="checkOrderEl(this)">تحقّق</button>
+      <button class="btn btn-clear" type="button" onclick="clearOrderEl(this)">امسح</button>
+      <button class="btn btn-reveal" type="button" onclick="revealOrderEl(this)">أظهر الجواب</button>
     </div>
-    <div class="feedback" id="fb-${key}"></div>
+    <div class="feedback" id="fb-${key}" role="region" aria-live="polite"></div>
   </div>`;
-}
-
-function pickFrag(key, fi, frags) {
-  if (!orderState[key]) orderState[key] = {answer:[], frags:frags};
-  const st = orderState[key];
-  if (st.answer.includes(fi)) return;
-  st.answer.push(fi);
-  refreshOrder(key);
 }
 
 function unpickFrag(key, fi) {
@@ -579,7 +620,7 @@ function refreshOrder(key) {
     el.classList.toggle('used', st.answer.includes(parseInt(el.dataset.i)));
   });
   const ans = document.getElementById(`ans-${key}`);
-  ans.innerHTML = st.answer.map(fi => `<span class="frag" onclick="unpickFrag('${key}',${fi})">${st.frags[fi]}</span>`).join('');
+  ans.innerHTML = st.answer.map(fi => `<button class="frag" type="button" onclick="unpickFrag('${key}',${fi})">${st.frags[fi]}</button>`).join('');
 }
 
 function clearOrder(key) {
@@ -589,11 +630,18 @@ function clearOrder(key) {
   refreshOrder(key);
 }
 
-function emptyAns(key) { /* no-op */ }
-
 function checkOrder(key, correct, pinyin, fragsJson) {
   const st = orderState[key];
-  if (!st || !st.answer.length) return;
+  if (!st || !st.answer.length) {
+    // User clicked تحقّق before placing any fragments
+    const fb = document.getElementById(`fb-${key}`);
+    fb.className = 'feedback info show';
+    fb.innerHTML = '';
+    const msg = document.createElement('div');
+    msg.textContent = '☝️ انقر على القطع أعلاه بالترتيب الصحيح أوّلاً، ثم اضغط «تحقّق».';
+    fb.appendChild(msg);
+    return;
+  }
   const userStr = st.answer.map(fi => st.frags[fi]).join('');
   const ok = normChinese(userStr) === normChinese(correct);
   const ans = document.getElementById(`ans-${key}`);
@@ -606,12 +654,37 @@ function checkOrder(key, correct, pinyin, fragsJson) {
   const clickable = ttsRenderByFragments(correct, frags);
   const speakerBtn = `<button class="btn-tts" onclick="ttsPlay('${correct.replace(/'/g,'').replace(/"/g,'&quot;')}', this)" title="استمع للجملة كاملة">🔊</button>`;
   if (ok) {
+    // Persist progress
+    try {
+      const done = JSON.parse(localStorage.getItem('hsk4_tpl_done') || '{}');
+      done[key] = Date.now();
+      localStorage.setItem('hsk4_tpl_done', JSON.stringify(done));
+      const card = document.getElementById(`q-${key}`);
+      if (card) card.classList.add('done');
+      updateProgressBadges();
+    } catch(e){}
     fb.className = 'feedback ok show';
     fb.innerHTML = `✅ <b>إجابة صحيحة!</b><div class="fb-sentence">${speakerBtn}${clickable}</div>${pinyin ? `<div class="fb-pinyin">${pinyin}</div>` : ''}<div class="fb-tip-tts">انقر على أي قطعة لسماع نطقها</div>`;
   } else {
     fb.className = 'feedback bad show';
     fb.innerHTML = `❌ <b>إجابتك غير صحيحة.</b> الصحيح:<div class="fb-sentence">${speakerBtn}${clickable}</div>${pinyin ? `<div class="fb-pinyin">${pinyin}</div>` : ''}<div class="fb-tip-tts">انقر على أي قطعة لسماع نطقها</div>`;
   }
+}
+
+function getProgressDone() {
+  try { return JSON.parse(localStorage.getItem('hsk4_tpl_done') || '{}'); } catch(e) { return {}; }
+}
+function updateProgressBadges() {
+  const done = getProgressDone();
+  const total = 120;
+  const completed = Object.keys(done).length;
+  const el = document.getElementById('progressBadge');
+  if (el) el.textContent = `${completed}/${total} ✓`;
+  // Mark done questions in DOM
+  Object.keys(done).forEach(k => {
+    const card = document.getElementById(`q-${k}`);
+    if (card) card.classList.add('done');
+  });
 }
 
 function revealOrder(key, correct, pinyin, explain, fragsJson) {
@@ -633,15 +706,15 @@ function revealOrder(key, correct, pinyin, explain, fragsJson) {
 function renderPictures() {
   const list = document.getElementById('pictures-list');
   list.innerHTML = PICTURES.map((t, ti) => `<div class="card" id="p-card-${ti}">
-    <div class="card-head" onclick="toggleCard(this)">
+    <button class="card-head" type="button" onclick="toggleCard(this)" aria-expanded="false">
       <div class="card-num">${ti+1}</div>
       <div class="card-titles">
         <div class="card-title-ar">${t.title_ar}</div>
         <div class="card-title-zh">${t.title_zh}</div>
       </div>
       <div class="card-badge">${t.items.length} كلمة</div>
-      <div class="chev">▼</div>
-    </div>
+      <div class="chev" aria-hidden="true">▼</div>
+    </button>
     <div class="card-body">
       <div class="pattern-box">
         <div class="pattern-label">القالب الموحَّد · 模板</div>
@@ -693,14 +766,13 @@ function togglePicAns(key) {
 }
 
 // ===== AI EVALUATION (DashScope Qwen) =====
-const DEFAULT_DS_KEY = 'sk-936218c7914b49c1bf71e256a3054baf';
+// API key is user-supplied only. No hardcoded default (the old embedded key was deactivated anyway).
 const DS_URLS = [
   'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
   'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions'
 ];
-
 function getApiKey() {
-  return localStorage.getItem('hsk4_ds_key') || DEFAULT_DS_KEY;
+  return localStorage.getItem('hsk4_ds_key') || '';
 }
 
 function openSettings() {
@@ -745,6 +817,7 @@ function resetApiKey() {
 async function callAI(prompt, attempt=0) {
   const url = DS_URLS[attempt % DS_URLS.length];
   const key = getApiKey();
+  if (!key) throw new Error('NEED_KEY');
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 20000);
   try {
@@ -880,28 +953,77 @@ Reply with JSON only:
     const sc = ev.score || 0;
     const cls = sc >= 4 ? 'pass' : sc >= 3 ? 'partial' : 'fail';
     const icon = sc >= 4 ? '✅' : sc >= 3 ? '⚠️' : '❌';
-    let html = `<div class="ai-score-row">${icon} <span class="score">${sc}/5</span></div>`;
-    html += `<div class="ai-criteria">
-      <span class="ai-tag ${ev.word_ok?'ok':'no'}">${ev.word_ok?'✓':'✗'} الكلمة</span>
-      <span class="ai-tag ${ev.image_match?'ok':'no'}">${ev.image_match?'✓':'✗'} الصورة</span>
-      <span class="ai-tag ${ev.grammar_ok?'ok':'no'}">${ev.grammar_ok?'✓':'✗'} القواعد</span>
-      <span class="ai-tag ${ev.meaning_ok?'ok':'no'}">${ev.meaning_ok?'✓':'✗'} المعنى</span>
-    </div>`;
-    if (ev.feedback) html += `<div class="ai-feedback">💬 ${ev.feedback}</div>`;
-    if (ev.correction) {
-      html += `<div class="ai-feedback">✏️ التصحيح المقترح:</div>`;
-      html += `<div class="ai-correction">${ev.correction}</div>`;
-      if (ev.corrPinyin) html += `<div class="ai-corr-pin">${ev.corrPinyin}</div>`;
-    }
+    // Build via DOM — model output is treated as text only, never HTML, to prevent injection
     out.className = `ai-result show ${cls}`;
-    out.innerHTML = html;
+    out.innerHTML = '';
+    const scoreRow = document.createElement('div');
+    scoreRow.className = 'ai-score-row';
+    scoreRow.innerHTML = `${icon} <span class="score"></span>`;
+    scoreRow.querySelector('.score').textContent = sc + '/5';
+    out.appendChild(scoreRow);
+    const crit = document.createElement('div');
+    crit.className = 'ai-criteria';
+    [
+      {ok: ev.word_ok, label: 'الكلمة'},
+      {ok: ev.image_match, label: 'الصورة'},
+      {ok: ev.grammar_ok, label: 'القواعد'},
+      {ok: ev.meaning_ok, label: 'المعنى'},
+    ].forEach(c => {
+      const tag = document.createElement('span');
+      tag.className = 'ai-tag ' + (c.ok ? 'ok' : 'no');
+      tag.textContent = (c.ok ? '✓ ' : '✗ ') + c.label;
+      crit.appendChild(tag);
+    });
+    out.appendChild(crit);
+    if (ev.feedback) {
+      const f = document.createElement('div');
+      f.className = 'ai-feedback';
+      f.textContent = '💬 ' + String(ev.feedback);
+      out.appendChild(f);
+    }
+    if (ev.correction) {
+      const lbl = document.createElement('div');
+      lbl.className = 'ai-feedback';
+      lbl.textContent = '✏️ التصحيح المقترح:';
+      out.appendChild(lbl);
+      const corr = document.createElement('div');
+      corr.className = 'ai-correction';
+      corr.textContent = String(ev.correction);
+      out.appendChild(corr);
+      if (ev.corrPinyin) {
+        const pin = document.createElement('div');
+        pin.className = 'ai-corr-pin';
+        pin.textContent = String(ev.corrPinyin);
+        out.appendChild(pin);
+      }
+    }
   } catch (e) {
+    const needKey = e.message === 'NEED_KEY';
     const isArr = /Arrearage|overdue|Access denied/i.test(e.message);
+    let msg;
+    if (needKey) msg = 'أضف مفتاح DashScope API أوّلاً — افتح ⚙️ API في الأعلى وأدخل مفتاحك (Alibaba يعطي رصيداً مجانياً).';
+    else if (isArr) msg = 'حساب المفتاح الحالي معلَّق (رصيد منتهٍ). افتح ⚙️ API وأدخل مفتاحاً جديداً.';
+    else msg = 'خطأ في التقييم: ' + e.message;
     out.className = 'ai-result show fail';
-    out.innerHTML = `<div class="ai-feedback">⚠️ ${isArr ? 'حساب المفتاح الحالي معلَّق (رصيد منتهٍ). افتح ⚙️ API في الأعلى وأدخل مفتاحك الخاص.' : 'خطأ في التقييم: ' + e.message}</div>
-      <div class="ai-feedback" style="margin-top:6px"><b>الجملة النموذجية:</b></div>
-      <div class="ai-correction">${it.example || ''}</div>
-      <div class="ai-corr-pin">${it.exPinyin || ''}</div>`;
+    // textContent for user-input/error message (NO HTML injection)
+    const safeMsg = document.createElement('div');
+    safeMsg.className = 'ai-feedback';
+    safeMsg.textContent = '⚠️ ' + msg;
+    out.innerHTML = '';
+    out.appendChild(safeMsg);
+    const exDiv = document.createElement('div');
+    exDiv.className = 'ai-feedback';
+    exDiv.style.marginTop = '6px';
+    exDiv.innerHTML = '<b>الجملة النموذجية:</b>';
+    out.appendChild(exDiv);
+    const corrDiv = document.createElement('div');
+    corrDiv.className = 'ai-correction';
+    corrDiv.textContent = it.example || '';
+    out.appendChild(corrDiv);
+    const pinDiv = document.createElement('div');
+    pinDiv.className = 'ai-corr-pin';
+    pinDiv.textContent = it.exPinyin || '';
+    out.appendChild(pinDiv);
   } finally {
     btn.disabled = false;
   }
@@ -909,6 +1031,7 @@ Reply with JSON only:
 
 renderGrammar();
 renderPictures();
+updateProgressBadges();
 </script>
 </body>
 </html>
