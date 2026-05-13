@@ -136,6 +136,8 @@ body{padding-bottom:60px}
 .zh-clickable{cursor:pointer;padding:1px 2px;border-radius:3px;transition:all 0.15s;display:inline-block}
 .zh-clickable:hover{background:rgba(200,164,90,0.2);color:var(--gold2)}
 .zh-clickable.playing{background:var(--gold);color:#fff;animation:pulse 0.6s ease}
+.zh-frag{padding:2px 8px;margin:0 2px;background:rgba(200,164,90,0.1);border:1px solid rgba(200,164,90,0.3)}
+.zh-frag:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
 .zh-token{display:inline-block;margin:0 1px}
 .fb-tip-tts{font-size:0.7rem;color:var(--ink3);margin-top:4px;text-align:center;font-style:italic;direction:rtl}
 .footer{text-align:center;color:var(--ink3);font-size:0.7rem;padding:14px;border-top:1px solid #e0d5c5;margin-top:20px}
@@ -265,6 +267,43 @@ function ttsRenderClickable(sentence, pinyin) {
   }).join('');
 }
 
+// Render the answer sentence split into the SAME fragments the student is reordering.
+// Greedy match: walk the answer from left, find which fragment starts here.
+function ttsRenderByFragments(answer, fragments) {
+  if (!fragments || !fragments.length) return ttsRenderClickable(answer, '');
+  const remaining = fragments.slice();
+  const parts = [];
+  let pos = 0;
+  while (pos < answer.length && remaining.length) {
+    let matched = -1;
+    for (let i = 0; i < remaining.length; i++) {
+      if (answer.substr(pos, remaining[i].length) === remaining[i]) {
+        matched = i;
+        break;
+      }
+    }
+    if (matched < 0) {
+      // Unmatched character (probably punctuation) → render alone
+      parts.push({ chars: answer[pos], clickable: false });
+      pos++;
+      continue;
+    }
+    parts.push({ chars: remaining[matched], clickable: true });
+    pos += remaining[matched].length;
+    remaining.splice(matched, 1);
+  }
+  // Trailing punctuation
+  while (pos < answer.length) {
+    parts.push({ chars: answer[pos], clickable: false });
+    pos++;
+  }
+  return parts.map(p => {
+    if (!p.clickable) return `<span class="zh-token">${p.chars}</span>`;
+    const safe = p.chars.replace(/"/g,'&quot;');
+    return `<span class="zh-token zh-clickable zh-frag" onclick="ttsPlay('${safe}', this)" title="انقر للاستماع">${p.chars}</span>`;
+  }).join('');
+}
+
 function ttsStop() {
   if (TTS_CURRENT) {
     try { TTS_CURRENT.pause(); } catch(e){}
@@ -379,18 +418,19 @@ function renderOrderQ(gi, qi, q) {
   const ansEsc = q.answer.replace(/'/g,'');
   const pinEsc = (q.pinyin||'').replace(/'/g,'');
   const expEsc = (q.explain||'').replace(/'/g,'');
+  const fragsJsonAttr = JSON.stringify(frags).replace(/"/g,'&quot;');
   return `<div class="q-item" id="q-${key}">
     <div><span class="q-num">${q.qNum}</span><span style="font-size:0.78rem;color:var(--ink3)">من الاختبار ${q.examId}</span></div>
     <div class="frags-wrap">
       <div class="frags-box" id="frags-${key}">
-        ${frags.map((f, fi) => `<span class="frag" data-i="${fi}" onclick="pickFrag('${key}',${fi},${JSON.stringify(frags).replace(/"/g,'&quot;')})">${f}</span>`).join('')}
+        ${frags.map((f, fi) => `<span class="frag" data-i="${fi}" onclick="pickFrag('${key}',${fi},${fragsJsonAttr})">${f}</span>`).join('')}
       </div>
       <div class="answer-area" id="ans-${key}" onclick="emptyAns('${key}')"></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-check" onclick="checkOrder('${key}','${ansEsc}','${pinEsc}')">تحقّق</button>
+      <button class="btn btn-check" data-frags="${fragsJsonAttr}" onclick="checkOrder('${key}','${ansEsc}','${pinEsc}',this.dataset.frags)">تحقّق</button>
       <button class="btn btn-clear" onclick="clearOrder('${key}')">امسح</button>
-      <button class="btn btn-reveal" onclick="revealOrder('${key}','${ansEsc}','${pinEsc}','${expEsc}')">أظهر الجواب</button>
+      <button class="btn btn-reveal" data-frags="${fragsJsonAttr}" onclick="revealOrder('${key}','${ansEsc}','${pinEsc}','${expEsc}',this.dataset.frags)">أظهر الجواب</button>
     </div>
     <div class="feedback" id="fb-${key}"></div>
   </div>`;
@@ -428,7 +468,7 @@ function clearOrder(key) {
 
 function emptyAns(key) { /* no-op */ }
 
-function checkOrder(key, correct, pinyin) {
+function checkOrder(key, correct, pinyin, fragsJson) {
   const st = orderState[key];
   if (!st || !st.answer.length) return;
   const userStr = st.answer.map(fi => st.frags[fi]).join('');
@@ -436,26 +476,30 @@ function checkOrder(key, correct, pinyin) {
   const ans = document.getElementById(`ans-${key}`);
   ans.className = 'answer-area ' + (ok ? 'ok' : 'bad');
   const fb = document.getElementById(`fb-${key}`);
-  const clickable = ttsRenderClickable(correct, pinyin);
+  let frags = [];
+  try { frags = JSON.parse(fragsJson); } catch(e) {}
+  const clickable = ttsRenderByFragments(correct, frags);
   const speakerBtn = `<button class="btn-tts" onclick="ttsPlay('${correct.replace(/'/g,'').replace(/"/g,'&quot;')}', this)" title="استمع للجملة كاملة">🔊</button>`;
   if (ok) {
     fb.className = 'feedback ok show';
-    fb.innerHTML = `✅ <b>إجابة صحيحة!</b><div class="fb-sentence">${speakerBtn}${clickable}</div>${pinyin ? `<div class="fb-pinyin">${pinyin}</div>` : ''}<div class="fb-tip-tts">انقر على أي كلمة لسماع نطقها</div>`;
+    fb.innerHTML = `✅ <b>إجابة صحيحة!</b><div class="fb-sentence">${speakerBtn}${clickable}</div>${pinyin ? `<div class="fb-pinyin">${pinyin}</div>` : ''}<div class="fb-tip-tts">انقر على أي قطعة لسماع نطقها</div>`;
   } else {
     fb.className = 'feedback bad show';
-    fb.innerHTML = `❌ <b>إجابتك غير صحيحة.</b> الصحيح:<div class="fb-sentence">${speakerBtn}${clickable}</div>${pinyin ? `<div class="fb-pinyin">${pinyin}</div>` : ''}<div class="fb-tip-tts">انقر على أي كلمة لسماع نطقها</div>`;
+    fb.innerHTML = `❌ <b>إجابتك غير صحيحة.</b> الصحيح:<div class="fb-sentence">${speakerBtn}${clickable}</div>${pinyin ? `<div class="fb-pinyin">${pinyin}</div>` : ''}<div class="fb-tip-tts">انقر على أي قطعة لسماع نطقها</div>`;
   }
 }
 
-function revealOrder(key, correct, pinyin, explain) {
+function revealOrder(key, correct, pinyin, explain, fragsJson) {
   const fb = document.getElementById(`fb-${key}`);
   fb.className = 'feedback info show';
-  const clickable = ttsRenderClickable(correct, pinyin);
+  let frags = [];
+  try { frags = JSON.parse(fragsJson); } catch(e) {}
+  const clickable = ttsRenderByFragments(correct, frags);
   const speakerBtn = `<button class="btn-tts" onclick="ttsPlay('${correct.replace(/'/g,'').replace(/"/g,'&quot;')}', this)" title="استمع للجملة كاملة">🔊</button>`;
   fb.innerHTML = `<b>الجواب الكامل:</b>
     <div class="fb-sentence">${speakerBtn}${clickable}</div>
     ${pinyin ? `<div class="fb-pinyin">${pinyin}</div>` : ''}
-    <div class="fb-tip-tts">انقر على أي كلمة لسماع نطقها</div>
+    <div class="fb-tip-tts">انقر على أي قطعة لسماع نطقها</div>
     ${explain ? `<div class="fb-explain">${explain}</div>` : ''}`;
 }
 
