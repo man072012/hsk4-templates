@@ -580,7 +580,7 @@ const TECHNIQUES = [
   {triggers:[['各位'],['欢迎'],['人们常说']], tip:'<b>各位 / 欢迎 / 人们常说</b> — نداء وترحيب ومقولة، تفتتح الفقرة (أوّلاً).'},
   {triggers:[['它'],['它们'],['这些'],['那儿'],['这样的']], tip:'<b>它 / 它们 / 这些 / 那儿 / 这样的</b> — ضمير/إشارة، الشيء الذي تشير إليه مذكور <u>قبلها</u>.'},
   {triggers:[['不但','还'],['不但','而且'],['不但','更'],['不仅','还'],['不仅','而且'],['不仅','更'],['不光','还'],['不光','而且'],['不光','更']], tip:'<b>不但 / 不仅 / 不光 … 还 / 而且 / 更</b> — الأوّل قبل الثاني (ليس فقط… بل أيضاً).'},
-  {triggers:[['只有','才']], tip:'<b>只有 … 才</b> — الشرط أوّلاً، و<b>才</b> تأتي أخيراً (فقط إذا… حينئذٍ).'},
+  {id:'zhiyou_cai', triggers:[['只有','才']], tip:'<b>只有 … 才</b> — الشرط أوّلاً، و<b>才</b> تأتي أخيراً (فقط إذا… حينئذٍ).'},
   {triggers:[['既然','那么']], tip:'<b>既然 … 那么</b> — الحقيقة أوّلاً ثم الاستنتاج (بما أنّ… إذن).'},
   {triggers:[['随着']], tip:'<b>随着</b> (مع تغيُّر…) — تحدّد الخلفية فتأتي أوّلاً.'},
   {triggers:[['吸引了']], tip:'<b>吸引了 …</b> (جذب الناس/الزوّار) — نتيجة نهائيّة، تأتي أخيراً.'},
@@ -601,15 +601,15 @@ const TECHNIQUES = [
   {triggers:[['是因为']], tip:'<b>是因为</b> (والسبب…) — تفسير، لا تأتي أوّلاً.'},
   {triggers:[['要想']], tip:'<b>要想 … 就 / 首先</b> — الهدف ثمّ الوسيلة.'},
   // ── Pattern formulas (from cheatsheet, ambers A–R) ──
-  {triggers:[['把']], tip:'🧩 <b>把字句</b> — الصيغة: <b>主 + 把 + 宾 + 动 + 补</b> (得/到/进/完/好/了). الفعل لا يأتي وحده.'},
-  {triggers:[['被']], tip:'🧩 <b>被字句</b> — الصيغة: <b>المتأثّر + 被 + الفاعل + الفعل + المكمِّل</b>. عكس 把 (المفعول أوّلاً).'},
-  {triggers:[['比']], tip:'🧩 <b>比 للمقارنة</b> — الصيغة: <b>A + 比 + B + صفة/فعل + الفرق</b>. الفرق في الأخير.'},
-  {triggers:[['是','的']], tip:'🧩 <b>是 … 的</b> — إطار تأكيد على ظرف معيّن (زمن، مكان، طريقة، فاعل).'},
+  {id:'ba', triggers:[['把']], tip:'🧩 <b>把字句</b> — الصيغة: <b>主 + 把 + 宾 + 动 + 补</b> (得/到/进/完/好/了). الفعل لا يأتي وحده.'},
+  {id:'bei', triggers:[['被']], tip:'🧩 <b>被字句</b> — الصيغة: <b>المتأثّر + 被 + الفاعل + الفعل + المكمِّل</b>. عكس 把 (المفعول أوّلاً).'},
+  {id:'bi', triggers:[['比']], tip:'🧩 <b>比 للمقارنة</b> — الصيغة: <b>A + 比 + B + صفة/فعل + الفرق</b>. الفرق في الأخير.'},
+  {id:'shi_de', triggers:[['是','的']], tip:'🧩 <b>是 … 的</b> — إطار تأكيد على ظرف معيّن (زمن، مكان، طريقة، فاعل).'},
   {triggers:[['离']], tip:'🧩 <b>离</b> للمسافة — الصيغة: <b>المكان A + 离 + المكان B + المسافة</b>.'},
   {triggers:[['将于'],['将']], tip:'🧩 <b>将 / 将于</b> (سوف، رسمي) — بعد الفاعل وقبل الفعل.'},
-  {triggers:[['难道']], tip:'🧩 <b>难道 …؟</b> — سؤال بلاغي استنكاري، أوّل الجملة، تنتهي بـ <b>؟</b>.'},
+  {id:'nandao', triggers:[['难道']], tip:'🧩 <b>难道 …؟</b> — سؤال بلاغي استنكاري، أوّل الجملة، تنتهي بـ <b>؟</b>.'},
   {triggers:[['连','都'],['连','也']], tip:'🧩 <b>连 + 都/也</b> (حتى…) — الصيغة: <b>主 + 连 + 宾 + 都/也 + 动</b>. تأكيد وتعجّب.'},
-  {triggers:[['让'],['使']], tip:'🧩 <b>让 / 使</b> تسبيب — الصيغة: <b>السبب + 让/使 + الشخص المتأثّر + فعل/صفة</b>.'},
+  {id:'rang_shi', triggers:[['让'],['使']], tip:'🧩 <b>让 / 使</b> تسبيب — الصيغة: <b>السبب + 让/使 + الشخص المتأثّر + فعل/صفة</b>.'},
   {triggers:[['竟然']], tip:'🧩 <b>竟然</b> (بشكل مفاجئ) — ظرف قبل الفعل.'},
   {triggers:[['由','组成']], tip:'🧩 <b>由 … 组成</b> (يتكوّن من) — الصيغة: <b>الموضوع + 由 + الأجزاء + 组成</b>.'},
   {triggers:[['深受']], tip:'🧩 <b>深受 … 欢迎 / 喜爱</b> — الصيغة: <b>الموضوع + 深受 + الفئة + 的 + 欢迎/喜爱</b>.'},
@@ -654,6 +654,18 @@ const RULE_TECHNIQUES = {
   '6':  '<b>只有 … 才</b> — الشرط الحصري («فقط إذا … حينئذٍ»). الشرط أوّلاً و<b>才</b> قبل النتيجة.',
   '27': '<b>一 … 就 …</b> — التسلسل السريع («بمجرّد أن … حصل فوراً»). الصيغة: <b>V₁ + 一 + V₂ + 就 + V₃</b>.',
   'عام': '<b>تركيب الجملة الأساسي</b> — الترتيب القياسي: <b>(ظرف زمن/مكان) + الفاعل + (ظرف تكرار/درجة) + الفعل + (المفعول) + (مكمّل / 了)</b>. علامات الجانب (了 / 着 / 过) تلتصق بالفعل مباشرة، ولا تأتي قبل الفاعل.'
+};
+
+// When a rule's own tip is shown, suppress these keyword-trigger IDs to avoid duplicates.
+// (The rule tip and keyword tip cover the same pattern with slightly different wording.)
+const RULE_SUPPRESSES = {
+  'A': ['ba'],
+  'B': ['bei'],
+  'E': ['bi'],
+  'F': ['shi_de'],
+  'I': ['nandao'],
+  'K': ['rang_shi'],
+  '6': ['zhiyou_cai'],
 };
 
 function matchTechniques(sentence) {
@@ -813,16 +825,19 @@ function revealOrder(key, correct, pinyin, explain, fragsJson, ruleCode) {
   const speakerBtn = `<button class="btn-tts" onclick="ttsPlay('${correct.replace(/'/g,'').replace(/"/g,'&quot;')}', this)" title="استمع للجملة كاملة">🔊</button>`;
   // Collect all relevant techniques: (1) rule's own technique, (2) keyword-trigger matches.
   const tipList = [];
-  const seen = new Set();
+  const seenTips = new Set();
   // 1. Rule-based technique (always shown for its rule's questions)
   const ruleTip = (typeof RULE_TECHNIQUES !== 'undefined' && ruleCode) ? RULE_TECHNIQUES[ruleCode] : null;
   if (ruleTip) {
     tipList.push(ruleTip);
-    seen.add(ruleTip);
+    seenTips.add(ruleTip);
   }
-  // 2. Additional keyword-trigger techniques (deduped against the rule one)
+  // 2. Build suppression set: keyword tech IDs that this rule's tip already covers
+  const suppress = (typeof RULE_SUPPRESSES !== 'undefined' && ruleCode && RULE_SUPPRESSES[ruleCode]) || [];
+  // 3. Additional keyword-trigger techniques (skip suppressed and tip-deduped)
   matchTechniques(correct).forEach(t => {
-    if (!seen.has(t.tip)) { tipList.push(t.tip); seen.add(t.tip); }
+    if (t.id && suppress.indexOf(t.id) !== -1) return;  // covered by rule tip
+    if (!seenTips.has(t.tip)) { tipList.push(t.tip); seenTips.add(t.tip); }
   });
   let tipsHtml = '';
   if (tipList.length) {
