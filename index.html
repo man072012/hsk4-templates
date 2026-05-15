@@ -524,6 +524,7 @@ function _qCtx(el) {
     answer: card.dataset.ans,
     pinyin: card.dataset.pin,
     explain: card.dataset.exp,
+    rule: card.dataset.rule || '',
     card
   };
 }
@@ -533,7 +534,7 @@ function checkOrderEl(btn) {
 }
 function revealOrderEl(btn) {
   const c = _qCtx(btn); if (!c) return;
-  revealOrder(c.key, c.answer, c.pinyin, c.explain, JSON.stringify(c.frags));
+  revealOrder(c.key, c.answer, c.pinyin, c.explain, JSON.stringify(c.frags), c.rule);
 }
 function clearOrderEl(btn) {
   const c = _qCtx(btn); if (!c) return;
@@ -608,12 +609,52 @@ const TECHNIQUES = [
   {triggers:[['将于'],['将']], tip:'🧩 <b>将 / 将于</b> (سوف، رسمي) — بعد الفاعل وقبل الفعل.'},
   {triggers:[['难道']], tip:'🧩 <b>难道 …؟</b> — سؤال بلاغي استنكاري، أوّل الجملة، تنتهي بـ <b>؟</b>.'},
   {triggers:[['连','都'],['连','也']], tip:'🧩 <b>连 + 都/也</b> (حتى…) — الصيغة: <b>主 + 连 + 宾 + 都/也 + 动</b>. تأكيد وتعجّب.'},
-  {triggers:[['让']], tip:'🧩 <b>让</b> تسبيب — الصيغة: <b>السبب + 让 + الشخص المتأثّر + فعل/صفة</b>.'},
+  {triggers:[['让'],['使']], tip:'🧩 <b>让 / 使</b> تسبيب — الصيغة: <b>السبب + 让/使 + الشخص المتأثّر + فعل/صفة</b>.'},
   {triggers:[['竟然']], tip:'🧩 <b>竟然</b> (بشكل مفاجئ) — ظرف قبل الفعل.'},
   {triggers:[['由','组成']], tip:'🧩 <b>由 … 组成</b> (يتكوّن من) — الصيغة: <b>الموضوع + 由 + الأجزاء + 组成</b>.'},
   {triggers:[['深受']], tip:'🧩 <b>深受 … 欢迎 / 喜爱</b> — الصيغة: <b>الموضوع + 深受 + الفئة + 的 + 欢迎/喜爱</b>.'},
   {triggers:[['不得不']], tip:'🧩 <b>不得不</b> (مضطر إلى) — قبل الفعل.'},
+  // Common HSK4 patterns in general sentences
+  {triggers:[['别'],['不要']], tip:'<b>别 / 不要 + فعل</b> — جملة الأمر بالنفي («لا تـ…»). الكلمة قبل الفعل مباشرة.'},
+  {triggers:[['太','了']], tip:'<b>太 + صفة + 了</b> — مبالغة («جداً / كثيراً جداً»). الصيغة الثابتة: <b>太 + 形容词 + 了</b>.'},
+  {triggers:[['没','过']], tip:'<b>没 + 动 + 过</b> — نفي اختبار ماضٍ («لم يسبق له…»). 过 تلتصق بالفعل وتدلّ على التجربة.'},
+  {triggers:[['不再']], tip:'<b>不再 + فعل</b> — «لم يعد يفعل…». تأتي قبل الفعل لنفي الاستمرار.'},
+  {triggers:[['从来','没']],tip:'<b>从来 + 没 + 动 + 过</b> — «أبداً ما فعل…». 从来 تعزّز نفياً مطلقاً.'},
+  {triggers:[['应该']], tip:'<b>应该 + فعل</b> — «ينبغي / يجب». ظرف مودال قبل الفعل.'},
+  {triggers:[['可能']], tip:'<b>可能 + فعل</b> — «من المحتمل». تأتي قبل الفعل أو في بداية الجملة.'},
+  {triggers:[['希望']], tip:'<b>主语 + 希望 + جملة</b> — «يأمل/يرجو». بعدها جملة كاملة.'},
+  {triggers:[['祝贺']], tip:'<b>祝贺 + شخص + (جملة)</b> — «أُهنّئ…». تبدأ الجملة الافتتاحيّة للتهنئة.'},
+  {triggers:[['为了']], tip:'<b>为了 + هدف، فعل</b> — «من أجل…». السبب أوّلاً ثم الإجراء.'},
+  {triggers:[['按']], tip:'<b>按 + شيء + الفعل</b> — «وفقاً لـ…». تحديد طريقة أو ترتيب قبل الفعل.'},
+  {triggers:[['吧']], tip:'<b>… 吧</b> — لاحقة في نهاية الجملة للاقتراح أو التأكيد الناعم («لنفعل…»).'},
+  {triggers:[['吗']], tip:'<b>… 吗 ؟</b> — لاحقة استفهامية في نهاية الجملة الخبريّة لتحويلها إلى سؤال نعم/لا.'},
 ];
+
+// ── Rule-based techniques: each grammar rule maps to its primary technique ──
+// Shown ALWAYS for any question in that rule, in addition to keyword matches.
+const RULE_TECHNIQUES = {
+  'A':  '🧩 <b>把字句</b> — الصيغة الثابتة: <b>主 + 把 + 宾 + 动 + 补</b> (得 / 到 / 进 / 完 / 好 / 了). الفعل لا يأتي وحده — لا بدّ من مكمِّل.',
+  'B':  '🧩 <b>被字句</b> — الصيغة: <b>المتأثّر + 被 + الفاعل + الفعل + المكمِّل</b>. عكس 把: المفعول يأتي أوّلاً.',
+  'C':  '🧩 <b>得 المكمِّل الدرجي</b> — الصيغة: <b>主 + 动 + 得 + وصف الدرجة</b>. 得 تلتصق بالفعل مباشرة، لا شيء بينهما.',
+  'D':  '🧩 <b>这 / 那 + 量词</b> — جملة الإشارة. الإشارة <b>这 / 那</b> + كلمة عدّ (个 / 条 / 种 / 次 / 场 / 件…) + اسم تأتي <u>أوّل الجملة</u> لأنّها الموضوع الرئيسي.',
+  'E':  '🧩 <b>比 للمقارنة</b> — الصيغة: <b>A + 比 + B + صفة / فعل + الفرق</b>. مقدار الفرق يأتي أخيراً.',
+  'F':  '🧩 <b>是 … 的</b> — إطار تأكيد على ظرف معيّن (زمن، مكان، طريقة، فاعل). الصيغة: <b>الموضوع + 是 + التفصيل + 的</b>.',
+  'I':  '🧩 <b>难道 …؟</b> — سؤال بلاغي استنكاري. <b>难道</b> تأتي أوّل الجملة، وتنتهي بعلامة استفهام <b>؟</b>.',
+  'J':  '🧩 <b>الجملة الوجوديّة (存在句)</b> — <u>المكان يأتي أوّلاً</u> (عكس العربية). الصيغة: <b>地点 + 里/上/中 + 有 / 着 / 是 + رقم + شيء</b>. مثال: 院子里 + 有 + 两棵苹果树.',
+  'K':  '🧩 <b>让 / 使 — جملة التسبيب</b>. الصيغة: <b>السبب + 让 / 使 + الشخص أو الشيء المتأثّر + فعل / صفة</b>. السبب أوّلاً.',
+  'M':  '🧩 <b>再 … 就 …</b> — مع مسافة/كميّة قبل النتيجة. الصيغة: <b>再 + كمّيّة + 就 + النتيجة</b>. مثال: 再走三公里 + 就 + 有加油站.',
+  'N':  '🧩 <b>越来越 + صفة</b> — تدرّج: «يصير أكثر فأكثر …». الصيغة الكاملة: <b>主 + 越来越 + 形容词 + 了</b>.',
+  'O':  '🧩 <b>从 … 到 …</b> — تحديد مدى زمني أو مكاني. الصيغة: <b>从 + البداية + 到 + النهاية + …</b>.',
+  'P':  '🧩 <b>对 … 有 / 熟悉 …</b> — تحديد علاقة بين شيء وآخر. الصيغة: <b>الموضوع + 对 + المتعلَّق + 有 / 熟悉 / 感兴趣 + …</b>.',
+  'Q':  '🧩 <b>给 … 留下 … 印象</b> — تأثير في الانطباع. الصيغة: <b>المتسبِّب + 给 + الشخص + 留下 + (很深的) 印象</b>.',
+  'R':  '🧩 <b>用 + أداة + الفعل</b> — استعمال أداة. الأداة تأتي قبل الفعل. مثال: <b>用笔</b> + 填写表格.',
+  'S':  '🧩 <b>地</b> — تحويل الصفة إلى ظرف حال. الصيغة: <b>الفاعل + (صفة) 地 + الفعل + (المفعول)</b>. مثال: 仔细地 + 整理 + 头发.',
+  'T':  '🧩 <b>正在 / 在 + الفعل</b> — الفعل المستمرّ الآن. <b>正在</b> أو <b>在</b> تأتي قبل الفعل مباشرة.',
+  'U':  '🧩 <b>到底 / 究竟</b> — تأكيد على السؤال («في النهاية …؟ / حقيقةً …؟»). تأتي قبل الكلمة الاستفهاميّة في جملة استفهام.',
+  '6':  '<b>只有 … 才</b> — الشرط الحصري («فقط إذا … حينئذٍ»). الشرط أوّلاً و<b>才</b> قبل النتيجة.',
+  '27': '<b>一 … 就 …</b> — التسلسل السريع («بمجرّد أن … حصل فوراً»). الصيغة: <b>V₁ + 一 + V₂ + 就 + V₃</b>.',
+  'عام': '<b>تركيب الجملة الأساسي</b> — الترتيب القياسي: <b>(ظرف زمن/مكان) + الفاعل + (ظرف تكرار/درجة) + الفعل + (المفعول) + (مكمّل / 了)</b>. علامات الجانب (了 / 着 / 过) تلتصق بالفعل مباشرة، ولا تأتي قبل الفاعل.'
+};
 
 function matchTechniques(sentence) {
   if (!sentence) return [];
@@ -663,8 +704,9 @@ function renderOrderQ(gi, qi, q) {
   const ansEsc = q.answer.replace(/'/g,'');
   const pinEsc = (q.pinyin||'').replace(/'/g,'');
   const expEsc = (q.explain||'').replace(/'/g,'');
+  const ruleCode = (q.rule||'').replace(/"/g,'&quot;');
   const fragsAttr = JSON.stringify(frags).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-  return `<div class="q-item" id="q-${key}" data-q="${key}" data-frags="${fragsAttr}" data-ans="${ansEsc.replace(/"/g,'&quot;')}" data-pin="${pinEsc.replace(/"/g,'&quot;')}" data-exp="${expEsc.replace(/"/g,'&quot;')}">
+  return `<div class="q-item" id="q-${key}" data-q="${key}" data-frags="${fragsAttr}" data-ans="${ansEsc.replace(/"/g,'&quot;')}" data-pin="${pinEsc.replace(/"/g,'&quot;')}" data-exp="${expEsc.replace(/"/g,'&quot;')}" data-rule="${ruleCode}">
     <div><span class="q-num">${q.qNum}</span><span style="font-size:0.78rem;color:var(--ink3)">من الاختبار ${q.examId}</span></div>
     <div class="frags-wrap">
       <div class="frags-box" id="frags-${key}" role="group" aria-label="قطع الجملة المعروضة عشوائياً">
@@ -760,7 +802,7 @@ function updateProgressBadges() {
   });
 }
 
-function revealOrder(key, correct, pinyin, explain, fragsJson) {
+function revealOrder(key, correct, pinyin, explain, fragsJson, ruleCode) {
   const fb = document.getElementById(`fb-${key}`);
   fb.className = 'feedback info show';
   let frags = [];
@@ -769,12 +811,23 @@ function revealOrder(key, correct, pinyin, explain, fragsJson) {
   ttsPreWarm([correct, ...frags]);
   const clickable = ttsRenderByFragments(correct, frags);
   const speakerBtn = `<button class="btn-tts" onclick="ttsPlay('${correct.replace(/'/g,'').replace(/"/g,'&quot;')}', this)" title="استمع للجملة كاملة">🔊</button>`;
-  // Match relevant techniques from the cheatsheet to this specific answer
-  const tips = matchTechniques(correct);
+  // Collect all relevant techniques: (1) rule's own technique, (2) keyword-trigger matches.
+  const tipList = [];
+  const seen = new Set();
+  // 1. Rule-based technique (always shown for its rule's questions)
+  const ruleTip = (typeof RULE_TECHNIQUES !== 'undefined' && ruleCode) ? RULE_TECHNIQUES[ruleCode] : null;
+  if (ruleTip) {
+    tipList.push(ruleTip);
+    seen.add(ruleTip);
+  }
+  // 2. Additional keyword-trigger techniques (deduped against the rule one)
+  matchTechniques(correct).forEach(t => {
+    if (!seen.has(t.tip)) { tipList.push(t.tip); seen.add(t.tip); }
+  });
   let tipsHtml = '';
-  if (tips.length) {
+  if (tipList.length) {
     tipsHtml = '<div class="tech-tips"><div class="tech-tips-label">🎯 تقنيات الحلّ التي تنطبق على هذه الجملة</div>'
-      + tips.map(t => `<div class="tech-tip">${t.tip}</div>`).join('')
+      + tipList.map(tip => `<div class="tech-tip">${tip}</div>`).join('')
       + '</div>';
   }
   fb.innerHTML = `<b>الجواب الكامل:</b>
