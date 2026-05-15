@@ -38,6 +38,27 @@ body{padding-bottom:60px}
 .section.active{display:block}
 .intro{background:linear-gradient(135deg,#fdf8ef,#f8f0e0);border:1px solid #e8d8b8;border-radius:12px;padding:14px 16px;margin-bottom:14px;font-size:0.85rem;line-height:1.7;color:var(--ink2)}
 .intro h2{color:var(--ink);font-size:1.05rem;margin-bottom:6px}
+.tech-box{background:linear-gradient(135deg,#fff,#fdf8ec);border:1px solid var(--gold);border-radius:14px;margin-bottom:14px;overflow:hidden;box-shadow:0 3px 12px rgba(168,132,47,.08)}
+.tech-toggle{width:100%;background:linear-gradient(135deg,#2c1810,#4a2f1a);color:#f0d89a;border:none;padding:12px 16px;cursor:pointer;font-family:inherit;font-size:0.92rem;font-weight:700;display:flex;justify-content:space-between;align-items:center;text-align:right}
+.tech-toggle:hover{background:linear-gradient(135deg,#4a2f1a,#5a3a22)}
+.tech-toggle[aria-expanded="true"] .tech-arrow{transform:rotate(180deg)}
+.tech-arrow{transition:transform .25s;font-size:0.8rem}
+.tech-body{padding:14px 16px}
+.tech-body[hidden]{display:none}
+.tech-intro{background:#fff8e8;border-right:3px solid var(--gold2);padding:10px 13px;border-radius:8px;font-size:0.82rem;color:var(--ink2);margin-bottom:14px;line-height:1.7}
+.tech-group{color:var(--ink);font-size:0.95rem;font-weight:700;margin:14px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--gold);display:flex;align-items:center;gap:6px}
+.tech-sub{color:var(--gold2);font-size:0.82rem;font-weight:700;margin:10px 0 6px;padding-right:8px;border-right:3px solid var(--gold2)}
+.tech-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:7px 10px;margin-bottom:5px;background:#fff;border:1px solid #f0e4c8;border-radius:7px;font-size:0.82rem}
+.tech-kw{font-family:'Noto Sans SC','PingFang SC',sans-serif;direction:ltr;display:inline-block;background:linear-gradient(135deg,#fdf3d8,#f9e8b8);color:var(--ink);padding:3px 9px;border-radius:5px;font-weight:600;font-size:0.86rem;white-space:nowrap;min-width:0}
+.tech-rule{color:var(--ink2);line-height:1.65}
+.tech-sep{border:none;border-top:1px dashed #d8c8a0;margin:18px 0}
+.tech-pattern{background:#fff;border:1px solid #e0d8c0;border-right:3px solid var(--blue);border-radius:8px;padding:9px 12px;margin-bottom:7px;font-size:0.82rem;line-height:1.8}
+.tech-pat-kw{font-family:'Noto Sans SC','PingFang SC',sans-serif;direction:ltr;display:inline-block;background:#e8f0f7;color:var(--blue);padding:2px 8px;border-radius:5px;font-weight:600;font-size:0.84rem;margin-left:6px}
+.tech-pat-form{color:var(--ink2);font-weight:600}
+.tech-pat-ex{font-family:'Noto Sans SC','PingFang SC',sans-serif;direction:ltr;display:inline-block;color:var(--ink);font-size:0.88rem;margin-top:3px;padding-right:8px}
+.tech-pat-ex b{color:var(--blue);font-weight:700}
+.tech-pat-ex i{color:var(--gold2);font-style:normal;font-weight:600}
+.tech-foot{margin-top:14px;padding:10px 13px;background:#f0f8ec;border-right:3px solid var(--green);border-radius:7px;font-size:0.78rem;color:var(--ink2);line-height:1.7}
 .card{background:var(--paper);border:1px solid #e8e0d5;border-radius:14px;margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden;transition:all 0.25s}
 .card.open{border-color:var(--gold)}
 .card-head{padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;background:transparent;transition:background 0.2s;width:100%;border:none;text-align:right;font-family:inherit;color:inherit}
@@ -202,6 +223,90 @@ body{padding-bottom:60px}
       <h2>القسم الأول · ترتيب الكلمات</h2>
       كل بطاقة أدناه تمثّل قاعدة نحوية واحدة، مع شرحها وقالبها العام وعدد من الأسئلة الفعلية من امتحانات HSK4 السابقة (الأسئلة 86–95). انقر للممارسة: رتّب القطع لتكوين الجملة، ثم تحقّق.
     </div>
+
+    <!-- ═══ Techniques Box ═══ -->
+    <div class="tech-box">
+      <button class="tech-toggle" onclick="toggleTech()" aria-expanded="false" aria-controls="techBody" type="button">
+        <span class="tech-title">🎯 تقنيات الحلّ السريع — اضغط للعرض</span>
+        <span class="tech-arrow">▼</span>
+      </button>
+      <div id="techBody" class="tech-body" hidden>
+
+        <div class="tech-intro">
+          مجموعة <b>قواعد مختصرة</b> مستخلصة من تحليل امتحانات HSK4 السابقة. تخبرك أين تضع كل كلمة دون تفكير. مرتّبة بحسب نوع الإشارة.
+        </div>
+
+        <!-- Group 1: Positional indicators -->
+        <h3 class="tech-group">📍 الموقع — أين تضع الكلمة في الجملة</h3>
+
+        <h4 class="tech-sub">دائماً أولاً</h4>
+        <div class="tech-row"><span class="tech-kw">各位 / 欢迎 / 人们常说 / 爷爷</span><span class="tech-rule">نداء وترحيب ومقولة → افتتاح الفقرة</span></div>
+        <div class="tech-row"><span class="tech-kw">随着</span><span class="tech-rule">«مع تغيُّر…» تحدّد الخلفية، فتأتي أولاً</span></div>
+        <div class="tech-row"><span class="tech-kw">平时 / 往往 / 常常 / 每天都</span><span class="tech-rule">العادة والروتين → تمهيد قبل الاستثناء</span></div>
+        <div class="tech-row"><span class="tech-kw">以前 / 从前 / 曾经</span><span class="tech-rule">حالة سابقة قبل تغيُّرها</span></div>
+        <div class="tech-row"><span class="tech-kw">这个/这条/这台/这种/这次/这些</span><span class="tech-rule">إشارة للموضوع الرئيسي → دائماً أول الجملة</span></div>
+
+        <h4 class="tech-sub">دائماً أخيراً</h4>
+        <div class="tech-row"><span class="tech-kw">所以 / 这样 / 因此</span><span class="tech-rule">«لذلك / هكذا» → النتيجة دائماً آخر شيء</span></div>
+        <div class="tech-row"><span class="tech-kw">吸引了很多人 / 游客</span><span class="tech-rule">جذب الناس = نتيجة نهائية</span></div>
+        <div class="tech-row"><span class="tech-kw">例如 / 比如 / 顺便</span><span class="tech-rule">المثال أو الفعل الإضافي بعد الفكرة الرئيسية</span></div>
+        <div class="tech-row"><span class="tech-kw">难怪</span><span class="tech-rule">«لا عجب» → خلاصة واستنتاج بعد معرفة السبب</span></div>
+        <div class="tech-row"><span class="tech-kw">可惜的是</span><span class="tech-rule">«المؤسف هو…» → بعد ذكر إيجابي ثم تحسُّر</span></div>
+
+        <h4 class="tech-sub">لا تأتي أولاً أبداً</h4>
+        <div class="tech-row"><span class="tech-kw">但 / 可是 / 不过 / 却</span><span class="tech-rule">«لكن» — لا بدّ أن يسبقها الفكرة الأصلية (ثانية أو ثالثة)</span></div>
+        <div class="tech-row"><span class="tech-kw">也</span><span class="tech-rule">«أيضاً» — إضافة، فتحتاج شيئاً قبلها</span></div>
+        <div class="tech-row"><span class="tech-kw">其实</span><span class="tech-rule">«في الحقيقة» — تصحّح اعتقاداً مذكوراً قبلها</span></div>
+        <div class="tech-row"><span class="tech-kw">换句话说 / 就是说</span><span class="tech-rule">إعادة صياغة لما قبلها</span></div>
+        <div class="tech-row"><span class="tech-kw">是因为</span><span class="tech-rule">«والسبب…» تفسّر نتيجة سابقة</span></div>
+        <div class="tech-row"><span class="tech-kw">甚至</span><span class="tech-rule">«حتى إنّ…» تصعيد، يحتاج إلى شيء أضعف قبلها</span></div>
+        <div class="tech-row"><span class="tech-kw">于是</span><span class="tech-rule">«وهكذا/فـ» نتيجة سرديّة لأحداث متتابعة</span></div>
+
+        <!-- Group 2: Paired connectors -->
+        <h3 class="tech-group">🔗 الكلمات المترابطة — أحدهما يستدعي الآخر</h3>
+        <div class="tech-row"><span class="tech-kw">不但/不仅/不光 … 还/而且/更</span><span class="tech-rule">«ليس فقط… بل أيضاً» — الأوّل قبل الثاني</span></div>
+        <div class="tech-row"><span class="tech-kw">只有 … 才</span><span class="tech-rule">«فقط إذا… حينئذٍ» — الشرط أوّلاً والنتيجة أخيراً</span></div>
+        <div class="tech-row"><span class="tech-kw">既然 … 那么</span><span class="tech-rule">«بما أنّ… إذن» — الحقيقة ثمّ الاستنتاج</span></div>
+        <div class="tech-row"><span class="tech-kw">本来 … 后来</span><span class="tech-rule">«في الأصل… لاحقاً» — الأصل قبل التغيير</span></div>
+        <div class="tech-row"><span class="tech-kw">如果/要是 … 就</span><span class="tech-rule">«إذا… فـ» — الشرط ثمّ النتيجة</span></div>
+        <div class="tech-row"><span class="tech-kw">要想 … 就/首先</span><span class="tech-rule">«إذا أردت… فعليك أوّلاً» — الهدف ثمّ الوسيلة</span></div>
+        <div class="tech-row"><span class="tech-kw">一 … 就</span><span class="tech-rule">«بمجرّد أن… حصل فوراً» — تسلسل سريع</span></div>
+        <div class="tech-row"><span class="tech-kw">连 … 都/也</span><span class="tech-rule">«حتى…» — تأكيد وتعجّب</span></div>
+
+        <!-- Group 3: Reference -->
+        <h3 class="tech-group">🔍 الإشارات المرجعية — ابحث عمَّا تُشير إليه</h3>
+        <div class="tech-row"><span class="tech-kw">它 / 它们 / 这些 / 那儿 / 这样的</span><span class="tech-rule">ضمير → الشيء الذي يُشير إليه مذكور قبلها</span></div>
+        <div class="tech-row"><span class="tech-kw">相反</span><span class="tech-rule">«على العكس» → الجملة المعاكسة موجودة قبلها</span></div>
+        <div class="tech-row"><span class="tech-kw">意思是</span><span class="tech-rule">«معناها هو…» → المصطلح المشروح موجود قبلها</span></div>
+        <div class="tech-row"><span class="tech-kw">以为</span><span class="tech-rule">«ظنّ خطأً» → بعدها التصحيح بـ其实/原来/后来</span></div>
+
+        <hr class="tech-sep">
+
+        <!-- Group 4: Pattern formulas -->
+        <h3 class="tech-group">🧩 صيغ التراكيب الجاهزة — انسخها كما هي</h3>
+        <div class="tech-pattern"><span class="tech-pat-kw">把</span><span class="tech-pat-form">主 + 把 + 宾 + 动 + 补 (得/到/进/完/好/了)</span><br><span class="tech-pat-ex"><b>姐姐</b> 把 <b>房间</b> 收拾 <i>得 很整齐</i> 。</span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">被</span><span class="tech-pat-form">المتأثّر + [ظرف] + 被 + الفاعل + الفعل + المكمِّل</span><br><span class="tech-pat-ex"><b>那盒饼干</b> 被 <b>儿子</b> 吃 <i>光了</i> 。</span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">得</span><span class="tech-pat-form">فعل + 得 + وصف الدرجة (لا شيء بينهما)</span><br><span class="tech-pat-ex"><b>他</b> 咳嗽 得 <i>越来越厉害</i> 。</span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">比</span><span class="tech-pat-form">A + 比 + B + فعل/صفة + الفرق (آخراً)</span><br><span class="tech-pat-ex"><b>今年公司的收入</b> 比 <b>去年</b> 增加了 <i>一倍</i> 。</span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">是 … 的</span><span class="tech-pat-form">الموضوع + 是 + التفصيل + 的 (إطار تأكيد)</span><br><span class="tech-pat-ex"><b>这次调查</b> 是 由李经理负责 的 。</span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">离</span><span class="tech-pat-form">المكان A + 离 + المكان B + المسافة</span><br><span class="tech-pat-ex"><b>北京</b> 离 <b>上海</b> 大约 <i>1084公里</i> 。</span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">将 / 将于</span><span class="tech-pat-form">«سوف» (رسمي) — بعد الفاعل وقبل الفعل</span><br><span class="tech-pat-ex"><b>飞机</b> 将于 <i>15分钟后</i> 降落在首都机场 。</span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">难道 … ؟</span><span class="tech-pat-form">«أيُعقل أن…؟» — سؤال بلاغي استنكاري في أوّل الجملة</span><br><span class="tech-pat-ex"><b>难道</b> 你没有先调查一下 <b>？</b></span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">مكان里/上 + 有</span><span class="tech-pat-form">المكان + 有 + رقم + شيء (عكس العربية)</span><br><span class="tech-pat-ex"><b>院子里</b> 有 <i>两棵</i> 苹果树 。</span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">让</span><span class="tech-pat-form">السبب + 让 + الشخص المتأثّر + فعل/صفة</span><br><span class="tech-pat-ex"><b>妈妈的鼓励</b> 让 <b>孩子</b> 不再害怕 。</span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">弹钢琴 (مدّة)</span><span class="tech-pat-form">الفعل المركّب (离合词) + المدّة → كرّر الفعل</span><br><span class="tech-pat-ex"><b>我</b> 弹 钢琴 弹了 <i>三年了</i> 。</span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">竟然</span><span class="tech-pat-form">«بشكل مفاجئ» — ظرف قبل الفعل</span><br><span class="tech-pat-ex"><b>教授</b> 竟然 把这次机会放弃了 。</span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">由 … 组成</span><span class="tech-pat-form">«يتكوّن من» — الموضوع + 由 + الأجزاء + 组成</span><br><span class="tech-pat-ex"><b>这篇文章</b> 由 <i>三部分</i> 组成 。</span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">深受 … 欢迎/喜爱</span><span class="tech-pat-form">«يحظى بـ» — الموضوع + 深受 + الفئة + 的 + 欢迎/喜爱</span><br><span class="tech-pat-ex"><b>那位演员</b> 深受 <b>观众</b> <i>的 喜爱</i> 。</span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">以 … 为 …</span><span class="tech-pat-form">«يأخذ… كـ…» — تحديد أساس أو معيار</span><br><span class="tech-pat-ex"><b>普通话</b> 以 <i>北京语音</i> 为 <i>标准音</i> 。</span></div>
+        <div class="tech-pattern"><span class="tech-pat-kw">不得不</span><span class="tech-pat-form">«مضطر إلى» — الفاعل + 不得不 + الفعل</span><br><span class="tech-pat-ex"><b>重感冒</b> 让他 不得不 请假休息 。</span></div>
+
+        <div class="tech-foot">
+          📚 هذه التقنيات مستخلصة من تحليل امتحانات HSK4 الفعلية. للممارسة المباشرة، انتقل لبطاقات القواعد أسفل هذا الصندوق.
+        </div>
+      </div>
+    </div>
+
     <div id="grammar-list"></div>
   </div>
 
@@ -564,6 +669,16 @@ function toggleCard(el) {
     el.setAttribute('aria-expanded', 'true');
     if (!card.dataset.init) card.dataset.init = '1';
   }
+}
+
+function toggleTech() {
+  const btn = document.querySelector('.tech-toggle');
+  const body = document.getElementById('techBody');
+  if (!btn || !body) return;
+  const open = btn.getAttribute('aria-expanded') === 'true';
+  btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+  if (open) body.setAttribute('hidden', '');
+  else body.removeAttribute('hidden');
 }
 
 // State per question
