@@ -181,6 +181,11 @@ body{padding-bottom:60px}
 .new-badge{font-size:0.7rem;font-weight:700;color:#fff;background:#2c8a4f;padding:2px 9px;border-radius:11px;margin-inline-start:8px;white-space:nowrap}
 .pic-item.pic-new{position:relative;outline:2px solid rgba(44,138,79,0.55);outline-offset:-1px;border-radius:10px}
 .pic-new-badge{position:absolute;top:6px;right:6px;z-index:3;font-size:0.62rem;font-weight:700;color:#fff;background:#2c8a4f;padding:2px 8px;border-radius:11px;box-shadow:0 1px 4px rgba(0,0,0,0.25)}
+
+/* بديل أنيق للصور التي لا تظهر */
+.pic-item .img-fallback{width:90px;height:90px;flex-shrink:0;border:1.5px dashed var(--gold);border-radius:8px;background:#f6efe2;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;padding:4px;font-size:20px;color:#b08b4f}
+.pic-item .img-fallback .ifw{font-size:1rem;font-weight:700;color:#2c1810;line-height:1.1}
+.pic-item .img-fallback small{font-size:.62rem;color:#7a6a55;line-height:1.15}
 </style>
 </head>
 <body>
@@ -910,8 +915,11 @@ function renderPicItem(ti, ii, it) {
   const key = `p${ti}_${ii}`;
   const newCls = it.new ? ' pic-new' : '';
   const newBadge = it.new ? `<span class="pic-new-badge">ورقة ${it.paper} · جديد</span>` : '';
+  const wEsc=(it.word||'').replace(/"/g,'&quot;');
+  const mEsc=(it.meaning||'').replace(/"/g,'&quot;');
+  const fb=`this.style.display='none';this.nextElementSibling.style.display='flex'`;
   return `<div class="pic-item${newCls}">
-    ${newBadge}<img src="${it.image}" alt="${it.word}" loading="lazy">
+    ${newBadge}<img src="${it.image}" alt="${it.word}" loading="lazy" onerror="${fb}"><div class="img-fallback" style="display:none">🖼️<span class="ifw">${wEsc}</span><small>${mEsc}</small></div>
     <div class="info">
       <div class="pic-word">${it.word}</div>
       <div class="pic-pin">${it.pinyin}</div>
